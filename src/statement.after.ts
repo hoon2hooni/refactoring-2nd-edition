@@ -1,29 +1,25 @@
 import { Invoice, Plays, Play, Performance } from './types';
 
 export default function statement(invoice: Invoice, plays: Plays) {
+  
   let totalAmount = 0;
-  let volumeCredits = 0;
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
 
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
-  
   for (let perf of invoice.performances) {
-    let thisAmount = amountFor(perf);
-
     // 포인트를 적립한다.
-    volumeCredits += volumeCreditsFor(perf);
-
-    result += `${playFor(perf).name} : ${format(thisAmount / 100)} (${
+    result += `${playFor(perf).name} : ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    totalAmount += thisAmount;
+    totalAmount += amountFor(perf);
   }
 
-  result += `총액: ${format(totalAmount / 100)}\n`;
+  // volumeCredit 따로 뺴줌
+  let volumeCredits = 0;
+  for (let perf of invoice.performances) {
+    volumeCredits += volumeCreditsFor(perf);
+  }
+
+  result += `총액: ${usd(totalAmount)}\n`;
   result += `적립 포인트: ${volumeCredits}점\n`;
 
   return result;
@@ -57,15 +53,23 @@ export default function statement(invoice: Invoice, plays: Plays) {
   function playFor(aPerformance: Performance) {
     return plays[aPerformance.playID];
   }
-
-  function volumeCreditsFor(perf: Performance) {
-    let volumeCredits = 0;
-    volumeCredits += Math.max(perf.audience - 30, 0);
+  //page 41쪽
+  function volumeCreditsFor(aPerformance: Performance) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
 
     // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === playFor(perf).type) {
-      volumeCredits += Math.floor(perf.audience / 5);
+    if ('comedy' === playFor(aPerformance).type) {
+      result += Math.floor(aPerformance.audience / 5);
     }
-    return volumeCredits
+    return result;
   }
-} 
+
+  function usd(aNumber: number) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(aNumber / 100);
+  }
+}
