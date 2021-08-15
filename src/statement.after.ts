@@ -10,17 +10,12 @@ export default function statement(invoice: Invoice, plays: Plays) {
     currency: 'USD',
     minimumFractionDigits: 2,
   }).format;
-
+  
   for (let perf of invoice.performances) {
-    let thisAmount = amountFor(perf, playFor(perf));
+    let thisAmount = amountFor(perf);
 
     // 포인트를 적립한다.
-    volumeCredits += Math.max(perf.audience - 30, 0);
-
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === playFor(perf).type) {
-      volumeCredits += Math.floor(perf.audience / 5);
-    }
+    volumeCredits += volumeCreditsFor(perf);
 
     result += `${playFor(perf).name} : ${format(thisAmount / 100)} (${
       perf.audience
@@ -33,11 +28,7 @@ export default function statement(invoice: Invoice, plays: Plays) {
 
   return result;
 
-  function playFor(aPerformance: Performance) {
-    return plays[aPerformance.playID];
-  }
-
-  function amountFor(aPerformance: Performance, play: Play) {
+  function amountFor(aPerformance: Performance) {
     //초기화 해주기
 
     let result = 0;
@@ -63,4 +54,18 @@ export default function statement(invoice: Invoice, plays: Plays) {
     }
     return result;
   }
-}
+  function playFor(aPerformance: Performance) {
+    return plays[aPerformance.playID];
+  }
+
+  function volumeCreditsFor(perf: Performance) {
+    let volumeCredits = 0;
+    volumeCredits += Math.max(perf.audience - 30, 0);
+
+    // 희극 관객 5명마다 추가 포인트를 제공한다.
+    if ('comedy' === playFor(perf).type) {
+      volumeCredits += Math.floor(perf.audience / 5);
+    }
+    return volumeCredits
+  }
+} 
