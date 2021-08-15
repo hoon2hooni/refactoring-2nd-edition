@@ -1,7 +1,6 @@
 import { Invoice, Plays, Play, Performance } from './types';
 
 export default function statement(invoice: Invoice, plays: Plays) {
-  
   let totalAmount = 0;
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
 
@@ -13,16 +12,19 @@ export default function statement(invoice: Invoice, plays: Plays) {
     totalAmount += amountFor(perf);
   }
 
-  // volumeCredit 따로 뺴줌
-  let volumeCredits = 0;
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
-  }
-
   result += `총액: ${usd(totalAmount)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
+  result += `적립 포인트: ${totalVolumeCredits()}점\n`;
 
   return result;
+
+  // volumeCredit 따로 뺴줌
+  function totalVolumeCredits() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += volumeCreditsFor(perf);
+    }
+    return result;
+  }
 
   function amountFor(aPerformance: Performance) {
     //초기화 해주기
