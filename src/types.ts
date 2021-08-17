@@ -13,7 +13,8 @@ export type Plays = {
 export interface Performance {
   playID: PlayID;
   audience: number;
-  play?: Play;
+  play: Play;
+  amount: number;
 }
 
 export interface Invoice {
