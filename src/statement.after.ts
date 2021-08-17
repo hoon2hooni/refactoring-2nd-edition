@@ -1,28 +1,27 @@
-import { Invoice, Plays, Performance } from './types';
+import { Invoice, Plays, Performance, Play } from './types';
 
 export default function statement(invoice: Invoice, plays: Plays) {
-  let result = `청구내역 (고객명: ${invoice.customer})\n`;
-  
-  //변수슬라이드
-  for (let perf of invoice.performances) {
-    result += `${playFor(perf).name} : ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+  return renderPlainText(invoice, plays);
+
+  function renderPlainText(invoice: Invoice, plays: Plays) {
+    let result = `청구내역 (고객명: ${invoice.customer})\n`;
+    for (let perf of invoice.performances) {
+      result += `${playFor(perf).name} : ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+    }
+    result += `총액: ${usd(totalAmount())}\n`;
+    result += `적립 포인트: ${totalVolumeCredits()}점\n`;
+    return result;
   }
-
-  result += `총액: ${usd(totalAmount())}\n`;
-  result += `적립 포인트: ${totalVolumeCredits()}점\n`;
-
-  return result;
 
   function totalAmount() {
     let result = 0
     for (let perf of invoice.performances) {
-      // 포인트를 적립한다.
       result += amountFor(perf);
     }
     return result
   }
 
-  // volumeCredit 따로 뺴줌
+  // 중첩함수 시작
   function totalVolumeCredits() {
     let result = 0;
     for (let perf of invoice.performances) {
