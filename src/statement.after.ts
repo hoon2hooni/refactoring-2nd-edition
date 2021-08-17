@@ -3,8 +3,19 @@ import { Invoice, Plays, Performance, Play } from './types';
 export default function statement(invoice: Invoice, plays: Plays) {
   const statementData: Invoice = {
     customer: invoice.customer,
-    performances: invoice.performances,
+    performances: invoice.performances.map(enrichPerformance),
   };
+
+  function playFor(aPerformance: Performance) {
+    return plays[aPerformance.playID];
+  }
+  function enrichPerformance(aPerformance: Performance) {
+    //Object.assign({}, aPerformance)
+    const result = { ...aPerformance }
+    result.play = playFor(result);
+    return result
+  }
+
   return renderPlainText(statementData, plays);
 
   function renderPlainText(data: Invoice, plays: Plays) {
@@ -71,9 +82,6 @@ export default function statement(invoice: Invoice, plays: Plays) {
     return result;
   }
 
-  function playFor(aPerformance: Performance) {
-    return plays[aPerformance.playID];
-  }
   //page 41쪽
   function volumeCreditsFor(aPerformance: Performance) {
     let result = 0;
