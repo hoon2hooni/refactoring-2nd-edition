@@ -1,12 +1,18 @@
 import { Invoice, Plays, Performance, Play } from './types';
 
 export default function statement(invoice: Invoice, plays: Plays) {
-  return renderPlainText(invoice, plays);
+  const statementData: Invoice = {
+    customer: invoice.customer,
+    performances: invoice.performances,
+  };
+  return renderPlainText(statementData, plays);
 
-  function renderPlainText(invoice: Invoice, plays: Plays) {
-    let result = `청구내역 (고객명: ${invoice.customer})\n`;
-    for (let perf of invoice.performances) {
-      result += `${playFor(perf).name} : ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+  function renderPlainText(data: Invoice, plays: Plays) {
+    let result = `청구내역 (고객명: ${data.customer})\n`;
+    for (let perf of data.performances) {
+      result += `${playFor(perf).name} : ${usd(amountFor(perf))} (${
+        perf.audience
+      }석)\n`;
     }
     result += `총액: ${usd(totalAmount())}\n`;
     result += `적립 포인트: ${totalVolumeCredits()}점\n`;
@@ -14,11 +20,11 @@ export default function statement(invoice: Invoice, plays: Plays) {
   }
 
   function totalAmount() {
-    let result = 0
+    let result = 0;
     for (let perf of invoice.performances) {
       result += amountFor(perf);
     }
-    return result
+    return result;
   }
 
   // 중첩함수 시작
@@ -28,6 +34,14 @@ export default function statement(invoice: Invoice, plays: Plays) {
       result += volumeCreditsFor(perf);
     }
     return result;
+  }
+
+  function usd(aNumber: number) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(aNumber / 100);
   }
 
   function amountFor(aPerformance: Performance) {
@@ -56,6 +70,7 @@ export default function statement(invoice: Invoice, plays: Plays) {
     }
     return result;
   }
+
   function playFor(aPerformance: Performance) {
     return plays[aPerformance.playID];
   }
@@ -69,13 +84,5 @@ export default function statement(invoice: Invoice, plays: Plays) {
       result += Math.floor(aPerformance.audience / 5);
     }
     return result;
-  }
-
-  function usd(aNumber: number) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(aNumber / 100);
   }
 }
