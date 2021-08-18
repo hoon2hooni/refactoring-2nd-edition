@@ -15,11 +15,14 @@ export interface Performance {
   audience: number;
   play: Play;
   amount: number;
+  volumeCredits: number;
 }
 
 export interface Invoice {
   customer: string;
   performances: Performance[];
+  totalAmount: number;
+  totalVolumeCredits: number;
 }
 
 export interface EnrichPerformance extends Omit<Performance, 'playID'> {
