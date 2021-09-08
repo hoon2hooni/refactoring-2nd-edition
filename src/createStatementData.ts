@@ -8,7 +8,9 @@ class PerformanceCalculator {
     this.performance = aPerformance;
     this.play = play;
   }
-
+  // get amount() {
+  //   throw new Error('subclass responsibility')
+  // }
   get volumeCredits() {
     return Math.max(this.performance.audience - 30, 0);
 
@@ -21,7 +23,7 @@ class TragedyCalculator extends PerformanceCalculator {
     if (this.performance.audience > 30) {
       result += 1000 * (this.performance.audience - 30);
     }
-    return result;
+    return result ;
   }
 }
 class ComedyCalculator extends PerformanceCalculator {
