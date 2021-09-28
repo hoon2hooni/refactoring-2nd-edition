@@ -48,6 +48,7 @@ class Order {
   get shipping() {
     return Math.min(this.quantity * this.itemPrice * 0.1, 0.05);
   }
+  
   get price() {
     return this.basePrice - this.quantityDiscount + this.shipping;
   }
